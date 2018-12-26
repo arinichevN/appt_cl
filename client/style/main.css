@@ -1,0 +1,87 @@
+.eqp_bb{
+    width: 100%;
+    min-height: 120px;
+}
+.eqp_b{
+    float:left;
+    margin: 3px;
+    min-height: 20px;
+}
+
+.eqp_c1{
+    float:left;
+    width: 100%;
+    margin-left: 1%;
+}
+
+.mn_block{
+    min-height: 20px;
+    min-width: 30px;
+    max-width: 150px;
+    float:left;
+    border: 2px solid #73AD21;
+    margin:5px;
+    padding: 10px 10px 10px 10px; 
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+.mn_interactive{
+    border-width: 2px;
+}
+.mn_interactive:hover{
+    border-width: 4px;
+    margin:3px;
+    cursor: default;
+}
+.mn_selected{
+    background-color: lightblue;
+    border-width: 4px;
+    margin:3px;
+}
+.mn_active{
+    font-weight: bold;
+    color:green;
+}
+
+.mn_descr{
+    margin-top:5px;
+    width: 100%;
+    font-size: 1em;
+}
+.mn_value{
+    width: 50%;
+    font-size: 1em;
+}
+.mn_work{
+    float:right;
+    width: 16px;
+    height: 16px;
+}
+.mn_d {
+    float:left;
+}
+.mn_dis{
+    opacity: 0.2;
+}
+.mn_updated{
+    border-color: greenyellow;
+    background-color: azure;
+}
+.br_block{
+    float:left;
+    width:100%;
+    padding-top:5px;
+    padding-bottom: 5px;
+    border-bottom: 3px dashed burlywood;
+}
+.br_value{
+    font-size: 1.5em;
+    font-weight: bold;
+    color: coral;
+}
+.br_descr{
+    
+}
