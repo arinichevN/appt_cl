@@ -1,8 +1,8 @@
 <?php
 
-namespace controller\program;
+namespace controller\channel;
 
-class get_data_runtime {
+class enable {
 
     public static function getUser() {
         return ['stranger' => '*'];
@@ -10,10 +10,8 @@ class get_data_runtime {
 
     public static function execute($p) {
         \sock\init($p['address'], $p['port']);
-        $id=\acp\requestSendI1List(ACP_CMD_PROG_GET_DATA_RUNTIME, $p['item']);
-        $data = \acp\responseReadRows($id);
+        \acp\requestSendI1List(ACP_CMD_CHANNEL_ENABLE, $p['item']);
         \sock\suspend();
-        return $data;
     }
 
 }

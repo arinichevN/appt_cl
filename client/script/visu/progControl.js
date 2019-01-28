@@ -17,7 +17,8 @@ function ProgControl(slave, kind) {
                 GET_DATA_INIT: 17,
                 GET_DATA_RUNTIME: 18,
                 GFTS: 19,
-                GERROR: 20
+                GERROR: 20, 
+                SETF:21
 
             },
     this.idE = c("input");
@@ -31,6 +32,7 @@ function ProgControl(slave, kind) {
     this.getrunB = cb("");
     this.getiniB = cb("");
     this.gftsB = cb("");
+    this.setfB = cb("");
     this.gerrB = cb("");
     this.updateStr = function () {
         this.idE.title = trans.get(332);
@@ -43,16 +45,17 @@ function ProgControl(slave, kind) {
         this.getrunB.innerHTML = trans.get(330);
         this.getiniB.innerHTML = trans.get(331);
         this.gftsB.innerHTML = "gfts";
+        this.setfB.innerHTML = "set float";
         this.gerrB.innerHTML = "gerr";
     };
     this.setPeer = function (peer) {
         if (peer === null) {
-            set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB, this.gerrB], true);
+            set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB], true);
             return;
         }
         this.peer.address = peer.address;
         this.peer.port = peer.port;
-        set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB, this.gerrB], false);
+        set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB], false);
     };
     this.update = function (state) {
         switch (state) {
@@ -72,7 +75,7 @@ function ProgControl(slave, kind) {
             self.unmark();
         }, 300);
     };
-    this.getProgIds = function () {
+    this.getI1List = function () {
         var arr = this.idE.value.split(",", 1000);
         for (var i = 0; i < arr.length; i++) {
             arr[i] = parseInt(arr[i]);
@@ -82,65 +85,101 @@ function ProgControl(slave, kind) {
         }
         return arr;
     };
+    this.getI1F1List = function () {
+		var i1f1l=[];
+        var arr = this.idE.value.split(";", 1000);
+        for (var i = 0; i < arr.length; i++) {
+			var iarr=arr[i].split(" ",2);
+			if(iarr.length!==2){
+				return null;
+			}
+			var i1f1={p0:0, p1:0.0};
+			i1f1.p0 = parseInt(iarr[0]);
+			i1f1.p1 = parseFloat(iarr[1]);
+						if (isNaN(i1f1.p0)||isNaN(i1f1.p1)) {
+                return null;
+            }
+			i1f1l.push(i1f1);
+            
+        }
+        return i1f1l;
+    };
     this.getProgInit = function () {
-        var pa = this.getProgIds();
+        var pa = this.getI1List();
         if (pa === null) {
             return;
         }
         var data = [
             {
-                action: ['controller', 'program', 'get_data_init'],
+                action: ['controller', 'channel', 'get_data_init'],
                 param: {address: this.peer.address, port: this.peer.port, item: pa}
             }
         ];
         sendTo(this, data, this.ACTION.GET_DATA_INIT, 'json_udp_acp');
     };
     this.sendRequest = function (action) {
-        var pa = this.getProgIds();
-        if (pa === null) {
-            return;
-        }
+
         var act = null;
         switch (action) {
             case this.ACTION.GET_DATA_INIT:
-                act = ['controller', 'program', 'get_data_init'];
+                act = ['controller', 'channel', 'get_data_init'];
                 break;
             case this.ACTION.GET_DATA_RUNTIME:
-                act = ['controller', 'program', 'get_data_runtime'];
+                act = ['controller', 'channel', 'get_data_runtime'];
                 break;
             case this.ACTION.START:
-                act = ['controller', 'program', 'start'];
+                act = ['controller', 'channel', 'start'];
                 break;
             case this.ACTION.STOP:
-                act = ['controller', 'program', 'stop'];
+                act = ['controller', 'channel', 'stop'];
                 break;
             case this.ACTION.RESET:
-                act = ['controller', 'program', 'reset'];
+                act = ['controller', 'channel', 'reset'];
                 break;
             case this.ACTION.ENABLE:
-                act = ['controller', 'program', 'enable'];
+                act = ['controller', 'channel', 'enable'];
                 break;
             case this.ACTION.DISABLE:
-                act = ['controller', 'program', 'disable'];
+                act = ['controller', 'channel', 'disable'];
                 break;
             case this.ACTION.GET_ENABLED:
-                act = ['controller', 'program', 'get_enabled'];
+                act = ['controller', 'channel', 'get_enabled'];
                 break;
             case this.ACTION.GFTS:
-                act = ['controller', 'program', 'gfts'];
+                act = ['controller', 'channel', 'gfts'];
+                break;
+             case this.ACTION.SETF:
+                act = ['controller', 'channel', 'setf'];
                 break;
             case this.ACTION.GERROR:
-                act = ['controller', 'program', 'gerr'];
+                act = ['controller', 'channel', 'gerr'];
                 break;
             default:
                 return;
         }
-        var data = [
-            {
+        var data=[];
+        switch (action) {
+            case this.ACTION.SETF:
+            var i1f1l=this.getI1F1List();console.log(i1f1l);
+                    if (i1f1l === null) {
+            return;
+        }
+            data.push({
                 action: act,
-                param: {address: this.peer.address, port: this.peer.port, item: pa}
-            }
-        ];
+                param: {address: this.peer.address, port: this.peer.port, item: i1f1l}
+            });
+            break;
+            default:
+              var i1l = this.getI1List();
+              if (i1l === null) {
+                  return;
+              }
+            data.push({
+                action: act,
+                param: {address: this.peer.address, port: this.peer.port, item: i1l}
+            });
+                break;
+        }
         sendTo(this, data, action, 'json_udp_acp');
     };
     this.confirm = function (action, d, dt_diff) {
@@ -162,6 +201,7 @@ function ProgControl(slave, kind) {
                 case this.ACTION.RESET:
                 case this.ACTION.ENABLE:
                 case this.ACTION.DISABLE:
+                case this.ACTION.SETF:
                     break;
                 default:
                     console.log("confirm: unknown action: ", action);
@@ -185,6 +225,7 @@ function ProgControl(slave, kind) {
                 case this.ACTION.RESET:
                 case this.ACTION.ENABLE:
                 case this.ACTION.DISABLE:
+                case this.ACTION.SETF:
                     this.slave.catchEdit(m, this.kind);
                     break;
                 default:
@@ -195,9 +236,9 @@ function ProgControl(slave, kind) {
             alert("control: abort: " + e.message);
         }
     };
-    cla([this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB, this.gerrB], ["eqp_b"]);
-    a(this.container, [this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB, this.gerrB]);
-    set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB, this.gerrB], true);
+    cla([this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB], ["eqp_b"]);
+    a(this.container, [this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB]);
+    set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB], true);
 //    cla(this.valueE, ["mn_value"]);
 //    cla(this.descrE, ["mn_descr"]);
 //    cla(this.workE, ["mn_work"]);
@@ -230,6 +271,9 @@ function ProgControl(slave, kind) {
     };
     this.gftsB.onclick = function () {
         self.sendRequest(self.ACTION.GFTS);
+    };
+    this.setfB.onclick = function () {
+        self.sendRequest(self.ACTION.SETF);
     };
     this.gerrB.onclick = function () {
         self.sendRequest(self.ACTION.GERROR);

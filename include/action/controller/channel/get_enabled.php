@@ -1,8 +1,8 @@
 <?php
 
-namespace controller\program;
+namespace controller\channel;
 
-class gfts {
+class get_enabled {
 
     public static function getUser() {
         return ['stranger' => '*'];
@@ -10,7 +10,7 @@ class gfts {
 
     public static function execute($p) {
         \sock\init($p['address'], $p['port']);
-        $id=\acp\requestSendI1List(ACP_CMD_GET_FTS, $p['item']);
+        $id=\acp\requestSendI1List(ACP_CMD_CHANNEL_GET_ENABLED, $p['item']);
         $data = \acp\responseReadRows($id);
         \sock\suspend();
         return $data;

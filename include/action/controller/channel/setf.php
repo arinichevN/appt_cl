@@ -1,8 +1,8 @@
 <?php
 
-namespace controller\program;
+namespace controller\channel;
 
-class get_enabled {
+class setf {
 
     public static function getUser() {
         return ['stranger' => '*'];
@@ -10,10 +10,8 @@ class get_enabled {
 
     public static function execute($p) {
         \sock\init($p['address'], $p['port']);
-        $id=\acp\requestSendI1List(ACP_CMD_PROG_GET_ENABLED, $p['item']);
-        $data = \acp\responseReadRows($id);
+        \acp\requestSendI1F1List(ACP_CMD_SET_FLOAT, $p['item']);
         \sock\suspend();
-        return $data;
     }
 
 }

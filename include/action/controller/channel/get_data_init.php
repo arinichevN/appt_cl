@@ -1,8 +1,8 @@
 <?php
 
-namespace controller\program;
+namespace controller\channel;
 
-class disable {
+class get_data_init {
 
     public static function getUser() {
         return ['stranger' => '*'];
@@ -10,8 +10,10 @@ class disable {
 
     public static function execute($p) {
         \sock\init($p['address'], $p['port']);
-        \acp\requestSendI1List(ACP_CMD_PROG_DISABLE, $p['item']);
+        $id=\acp\requestSendI1List(ACP_CMD_CHANNEL_GET_DATA_INIT, $p['item']);
+        $data = \acp\responseReadRows($id);
         \sock\suspend();
+        return $data;
     }
 
 }
