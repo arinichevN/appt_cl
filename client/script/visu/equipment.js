@@ -57,7 +57,7 @@ function Equipment() {
     this.initialized = false;
     this.update = true; //editor will make it false
     this.visible = false;
-
+	this.fs=null;
     this.startB = null;
     this.stopB = null;
     this.resetB = null;
@@ -73,6 +73,7 @@ function Equipment() {
         try {
             var self = this;
             this.container = cvis();
+            this.fs=new Fieldset();
             this.startB = cb("");
             this.stopB = cb("");
             this.resetB = cb("");
@@ -99,14 +100,13 @@ function Equipment() {
             this.helpB.onclick = function () {
                 self.sendCmdt(ACP.CMD.APP.HELP);
             };
-            var bcont = cd();
             this.textE = c('pre');
             this.progE = new ProgControl(this, this.CATCH.PROG);
-            a(bcont, [this.startB, this.stopB, this.resetB, this.stateB, this.dataB, this.helpB]);
-            a(this.container, [this.peerE, bcont, this.progE, this.bb, this.textE]);
+            a(this.fs, [this.startB, this.stopB, this.resetB, this.stateB, this.dataB, this.helpB]);
+            a(this.container, [this.peerE, this.fs.container, this.progE, this.bb, this.textE]);
 
             cla(this.bb, 'eqp_bb');
-            cla([this.peerE, bcont], ["eqp_c1", 'lg1']);
+            cla([this.peerE], ["eqp_c1", 'lg1']);
             cla([this.startB, this.stopB, this.resetB, this.stateB, this.dataB, this.helpB], ["eqp_b"]);
             for (var i = 0; i < this.board.length; i++) {
                 this.board[i].elem = new BrButton(this.board[i].id, this.board[i].description, this, 1);
@@ -146,6 +146,7 @@ function Equipment() {
     };
     this.updateStr = function () {
         try {
+			this.fs.updateStr(trans.get(334));
             this.startB.innerHTML = trans.get(303);
             this.stopB.innerHTML = trans.get(304);
             this.resetB.innerHTML = trans.get(305);
@@ -341,6 +342,9 @@ function Equipment() {
     };
     this.catchEdit = function (data, kind) {
         try {
+			if (typeof data === 'undefined') {
+				throw new Error("equipment: bad data");
+			}
             switch (kind) {
                 case this.CATCH.APP:
                     var done1 = false, done2 = false;
@@ -358,7 +362,6 @@ function Equipment() {
                             this.progE.setPeer(null);
                         }
                         if (done1 && done2) {
-
                             break;
                         }
                     }

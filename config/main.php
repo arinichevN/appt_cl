@@ -1,7 +1,7 @@
 <?php
 
-define('DB_PATH_PUBLIC', '/etc/controller/public.db');
-define('DB_PATH_LOG', '/media/bb_usb/log.db');
+ini_set('display_errors',1);
+error_reporting(E_ALL|E_STRICT);
 function f_getConfig() {
     return [
         'db' => [

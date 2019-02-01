@@ -21,6 +21,7 @@ function ProgControl(slave, kind) {
                 SETF:21
 
             },
+	this.fs=new Fieldset();
     this.idE = c("input");
     s(this.idE, "size", 50);
     this.startB = cb("");
@@ -36,6 +37,7 @@ function ProgControl(slave, kind) {
     this.gerrB = cb("");
     this.updateStr = function () {
         this.idE.title = trans.get(332);
+        this.fs.updateStr(trans.get(333));
         this.startB.innerHTML = trans.get(324);
         this.stopB.innerHTML = trans.get(325);
         this.resetB.innerHTML = trans.get(326);
@@ -96,26 +98,13 @@ function ProgControl(slave, kind) {
 			var i1f1={p0:0, p1:0.0};
 			i1f1.p0 = parseInt(iarr[0]);
 			i1f1.p1 = parseFloat(iarr[1]);
-						if (isNaN(i1f1.p0)||isNaN(i1f1.p1)) {
+			if (isNaN(i1f1.p0)||isNaN(i1f1.p1)) {
                 return null;
             }
 			i1f1l.push(i1f1);
             
         }
         return i1f1l;
-    };
-    this.getProgInit = function () {
-        var pa = this.getI1List();
-        if (pa === null) {
-            return;
-        }
-        var data = [
-            {
-                action: ['controller', 'channel', 'get_data_init'],
-                param: {address: this.peer.address, port: this.peer.port, item: pa}
-            }
-        ];
-        sendTo(this, data, this.ACTION.GET_DATA_INIT, 'json_udp_acp');
     };
     this.sendRequest = function (action) {
 
@@ -160,10 +149,10 @@ function ProgControl(slave, kind) {
         var data=[];
         switch (action) {
             case this.ACTION.SETF:
-            var i1f1l=this.getI1F1List();console.log(i1f1l);
-                    if (i1f1l === null) {
-            return;
-        }
+	            var i1f1l=this.getI1F1List();
+				if (i1f1l === null) {
+		            return;
+		        }
             data.push({
                 action: act,
                 param: {address: this.peer.address, port: this.peer.port, item: i1f1l}
@@ -190,11 +179,7 @@ function ProgControl(slave, kind) {
                 case this.ACTION.GET_ENABLED:
                 case this.ACTION.GFTS:
                 case this.ACTION.GERROR:
-                    if (typeof d !== 'undefined') {
-                        this.slave.catchEdit(d, this.kind);
-                    } else {
-                        this.slave.catchEdit("failed", this.kind);
-                    }
+					this.slave.catchEdit(d, this.kind);
                     break;
                 case this.ACTION.START:
                 case this.ACTION.STOP:
@@ -237,7 +222,8 @@ function ProgControl(slave, kind) {
         }
     };
     cla([this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB], ["eqp_b"]);
-    a(this.container, [this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB]);
+    a(this.fs.container, [this.idE, this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB]);
+	a(this.container, [this.fs.container]);
     set_disabled([this.startB, this.stopB, this.resetB, this.enableB, this.disableB, this.getenB, this.getiniB, this.getrunB, this.gftsB,this.setfB, this.gerrB], true);
 //    cla(this.valueE, ["mn_value"]);
 //    cla(this.descrE, ["mn_descr"]);
